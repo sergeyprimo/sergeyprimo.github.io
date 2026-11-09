@@ -342,18 +342,33 @@
               placeholder="https://drive.google.com/... или https://disk.yandex.ru/..."
               class="w-full bg-[#0d1222] border border-[#26375c] focus:border-amber-400 rounded-lg px-3.5 py-3 text-xs text-white outline-none transition font-mono"
             >
-            <p class="text-[10px] text-amber-300/80">
-              ⚠️ Откройте общий доступ к ссылке («Все, у кого есть ссылка»). Архив должен содержать папку машины из <code class="text-amber-200">content/cars/...</code>
-            </p>
+            <!-- Reminder about regulation car folder naming -->
+            <div class="p-3 rounded-xl bg-amber-950/60 border border-amber-500/40 text-xs text-amber-200 space-y-2 leading-relaxed">
+              <div class="flex items-center gap-1.5 font-black text-amber-300 text-[11px] uppercase tracking-wide">
+                <span>⚠️</span> <span>НАПОМИНАНИЕ: ПАПКА АВТОМОБИЛЯ ДОЛЖНА БЫТЬ НАЗВАНА СТРОГО ПО РЕГЛАМЕНТУ!</span>
+              </div>
+              <p class="text-[11px] text-slate-300">
+                Архив должен содержать папку машины для папки игры <code class="text-amber-300 font-mono">content/cars/...</code>. Название папки обязательно в формате:
+              </p>
+              <div class="p-2 rounded-lg bg-black/70 border border-amber-500/30 text-xs font-mono text-cyan-300 select-all font-bold">
+                db_марка_модель_имя_фамилия
+              </div>
+              <div class="text-[11px] text-amber-200 font-semibold bg-emerald-950/40 border border-emerald-500/30 p-2 rounded-lg">
+                👉 Пример папки по регламенту: <code class="text-emerald-400 font-mono font-bold select-all">db_toyota_supra_a80_ivan_ivanov</code>
+              </div>
+              <p class="text-[10px] text-slate-400">
+                * Убедитесь, что открыт общий доступ к ссылке («Все, у кого есть ссылка»).
+              </p>
+            </div>
 
             <div>
               <label class="block text-[11px] font-semibold text-slate-300 mb-1">
-                Название папки автомобиля в игре (необязательно):
+                Название папки автомобиля в игре (по регламенту):
               </label>
               <input 
                 type="text" 
                 id="regCustomCarName" 
-                placeholder="Например: custom_s15_drift"
+                placeholder="Пример: db_toyota_supra_a80_ivan_ivanov"
                 class="w-full bg-[#0d1222] border border-[#232f50] focus:border-amber-400 rounded-lg px-3 py-2 text-xs text-white font-mono-tech outline-none transition"
               >
             </div>
