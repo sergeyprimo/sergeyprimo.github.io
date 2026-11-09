@@ -1144,9 +1144,9 @@
             <label class="flex items-center justify-between p-4 bg-[#0c1222] border border-[#1b2640] rounded-2xl cursor-pointer hover:border-[#2b3d66] transition">
               <div>
                 <div class="text-xs font-black text-white uppercase flex items-center gap-2">
-                  <span>🎨</span> <span>Поле кастомной ливреи</span>
+                  <span>🎨</span> <span>Раздел личной ливреи / скина</span>
                 </div>
-                <div class="text-[11px] text-slate-400 mt-1">Отображать поле ссылки на скин (+100 ₽)</div>
+                <div class="text-[11px] text-slate-400 mt-1">Отображать раздел загрузки ливреи на Шаге 2 (+100 ₽ к взносу)</div>
               </div>
               <input type="checkbox" id="adminOptAllowLivery" checked class="w-5 h-5 text-cyan-500 rounded accent-cyan-500 cursor-pointer">
             </label>
@@ -1820,8 +1820,16 @@
       const teamWrapper = document.getElementById('fieldWrapperTeam');
       if (teamWrapper) teamWrapper.style.display = (s.allowTeam !== false) ? '' : 'none';
 
+      // Personal livery section toggle
+      const isLiveryAllowed = (s.allowLivery !== false);
+      const liveryCard = document.getElementById('liveryLinkCard');
+      if (liveryCard) liveryCard.style.display = isLiveryAllowed ? '' : 'none';
       const liveryWrapper = document.getElementById('fieldWrapperLivery');
-      if (liveryWrapper) liveryWrapper.style.display = s.allowLivery ? '' : 'none';
+      if (liveryWrapper) liveryWrapper.style.display = isLiveryAllowed ? '' : 'none';
+      if (!isLiveryAllowed) {
+        const liveryInput = document.getElementById('regLiveryLink');
+        if (liveryInput) liveryInput.value = '';
+      }
 
       const vdcCard = document.getElementById('carChoiceCardVdc');
       const customCard = document.getElementById('carChoiceCardCustom');
@@ -2603,7 +2611,8 @@
       const s = getAdminSettings();
       const baseFee = s.baseFee || 150;
       const liveryFee = s.liveryFee || 100;
-      const hasLivery = s.allowLivery && !!(document.getElementById('regLiveryLink')?.value?.trim());
+      const isLiveryAllowed = (s.allowLivery !== false);
+      const hasLivery = isLiveryAllowed && !!(document.getElementById('regLiveryLink')?.value?.trim());
       const total = baseFee + (hasLivery ? liveryFee : 0);
 
       const totalEl = document.getElementById('displayTotalFeeCalculated');
@@ -2788,7 +2797,7 @@
         carModel = document.getElementById('regCustomCarName')?.value.trim() || 'Личная машина (по ссылке)';
       }
 
-      const liveryLink = document.getElementById('regLiveryLink')?.value.trim() || '';
+      const liveryLink = (s.allowLivery !== false) ? (document.getElementById('regLiveryLink')?.value.trim() || '') : '';
       const paymentProof = document.getElementById('regPaymentProof')?.value.trim() || '';
 
       const payload = {
