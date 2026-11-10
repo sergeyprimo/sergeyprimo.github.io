@@ -553,7 +553,7 @@
               </button>
             </div>
 
-            <div class="text-xs text-slate-300 bg-[#0c1120] p-3.5 rounded-lg border border-[#1d2740] leading-relaxed max-h-28 overflow-y-auto">
+            <div id="step3RegulationsPreview" class="text-xs text-slate-300 bg-[#0c1120] p-3.5 rounded-lg border border-[#1d2740] leading-relaxed max-h-32 overflow-y-auto whitespace-pre-line">
               Подавая заявку на участие в соревнованиях, пилот подтверждает полное ознакомление и согласие с официальным Регламентом соревнований, дисциплинарным кодексом, правилами судейства квалификации и парных заездов, а также условиями публичной оферты.
             </div>
 
@@ -756,7 +756,7 @@
         <button onclick="closeRegulationsModal()" class="text-slate-400 hover:text-white text-2xl font-bold px-2 cursor-pointer">&times;</button>
       </div>
 
-      <div class="text-xs text-slate-300 space-y-3 max-h-[60vh] overflow-y-auto pr-2 leading-relaxed whitespace-pre-line bg-[#0c1120] p-4 rounded-xl border border-[#1b253e]">
+      <div id="regulationsModalBody" class="text-xs text-slate-300 space-y-3 max-h-[60vh] overflow-y-auto pr-2 leading-relaxed whitespace-pre-line bg-[#0c1120] p-4 rounded-xl border border-[#1b253e]">
 1. ОБЩИЕ ПОЛОЖЕНИЯ
 Участие в соревнованиях является добровольным. Подавая заявку, пилот подтверждает полное согласие с регламентом турнира, судейскими критериями и условиями проведения заездов.
 
@@ -1292,12 +1292,27 @@
             </label>
 
             <div>
-              <label class="block text-xs font-bold text-slate-300 uppercase mb-1.5">Текст регламента соревнований и публичной оферты:</label>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1.5">
+                <label class="block text-xs font-bold text-slate-300 uppercase">Текст регламента соревнований и публичной оферты:</label>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="resetRegulationsTextToDefault()" class="text-[11px] text-slate-400 hover:text-amber-300 transition cursor-pointer">
+                    🔄 Сбросить к стандартному
+                  </button>
+                  <button type="button" onclick="previewRegulationsModalFromAdmin()" class="text-[11px] bg-[#18243c] hover:bg-[#23355a] text-cyan-300 font-bold px-2.5 py-1 rounded-lg border border-[#26375c] transition cursor-pointer">
+                    👁️ Просмотр окна пилота
+                  </button>
+                </div>
+              </div>
               <textarea 
                 id="adminRegulationsText" 
                 rows="11"
                 class="w-full bg-[#080d19] border border-[#212f4d] focus:border-amber-400 rounded-xl p-4 text-xs text-slate-200 outline-none leading-relaxed font-mono"
               ></textarea>
+              <div class="flex justify-end pt-3">
+                <button type="button" onclick="saveAllAdminSettings()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs py-2 px-5 rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer">
+                  <span>💾</span> <span>Сохранить текст регламента</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1537,7 +1552,7 @@
       gsheetViewUrl: "",
       adminPin: "7777",
       judgePin: "5555",
-      regulationsText: "1. ОБЩИЕ ПОЛОЖЕНИЯ\n1.1. Турнир по виртуальному дрифту в симуляторе Assetto Corsa.\n1.2. К участию допускаются пилоты, прошедшие официальную регистрацию и оплатившие стартовый взнос.\n1.3. ФИО участника должны в точности соответствовать игровому никнейму в Content Manager.\n\n2. ТРЕБОВАНИЯ К АВТОМОБИЛЯМ\n2.1. Разрешено участие на автомобилях пака VDC Public 5.0 либо личном авто, одобренном судейской коллегией.\n2.2. Запрещено внесение несанкционированных изменений в физику официальных автомобилей.\n\n3. ПРАВИЛА И СУДЕЙСТВО\n3.1. Квалификация проводится в 2 одиночных попытки.\n3.2. Парные заезды проводятся по олимпийской сетке ТОП-32 / ТОП-16 с выбыванием.\n3.3. Решения судейской коллегии являются окончательными и обжалованию во время этапа не подлежат.\n\n4. ОПЛАТА И ПУБЛИЧНАЯ ОФЕРТА\n4.1. Оплата стартового взноса подтверждает безоговорочное согласие участника со всеми правилами турнира.\n4.2. При неявке участника на этап стартовый взнос не возвращается."
+      regulationsText: "1. ОБЩИЕ ПОЛОЖЕНИЯ\nУчастие в соревнованиях является добровольным. Подавая заявку, пилот подтверждает полное согласие с регламентом турнира, судейскими критериями и условиями проведения заездов.\n\n2. ТЕХНИЧЕСКИЕ ТРЕБОВАНИЯ\nПилоты выступают либо на автомобилях из официального пака VDC Public 5.0, либо на личных автомобилях, соответствующих регламенту класса. Любые несанкционированные модификации физики строго запрещены.\n\n3. СУДЕЙСТВО И СОРЕВНОВАТЕЛЬНАЯ ДИСЦИПЛИНА\nКвалификация проводится по официальной судейской системе RDS GP (2 попытки, в зачет идет лучшая). Парные заезды проводятся по олимпийской сетке ТОП-32 / ТОП-16.\nЗапрещены оскорбления, неспортивное поведение, намеренные столкновения и срезки. Обязательно присутствие на брифинге пилотов.\n\n4. СТАРТОВЫЙ ВЗНОС И ОФЕРТА\nСтартовый взнос направляется на организационные расходы турнира, поддержку серверов и призовой фонд. Взнос не подлежит возврату после утверждения сетки заездов."
     };
 
     function getAdminPin() {
@@ -1738,7 +1753,11 @@
       setVal('adminBoostyUrl', s.boostyUrl || 'https://boosty.to/drift_banda');
       setChk('adminOptAllowBoosty', s.allowBoosty !== false);
       setChk('adminOptRequireConsent', s.requireConsent !== false);
-      setVal('adminRegulationsText', s.regulationsText || DEFAULT_ADMIN_SETTINGS.regulationsText);
+      let curReg = s.regulationsText || DEFAULT_ADMIN_SETTINGS.regulationsText;
+      if (curReg && curReg.includes('1.1. Турнир по виртуальному дрифту')) {
+        curReg = DEFAULT_ADMIN_SETTINGS.regulationsText;
+      }
+      setVal('adminRegulationsText', curReg);
       setVal('adminJudgePinInput', getJudgePin());
     }
 
@@ -1883,9 +1902,14 @@
         }
       }
 
+      const regText = s.regulationsText || DEFAULT_ADMIN_SETTINGS.regulationsText;
       const regBody = document.getElementById('regulationsModalBody');
-      if (regBody && s.regulationsText) {
-        regBody.innerHTML = s.regulationsText.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('');
+      if (regBody) {
+        regBody.textContent = regText;
+      }
+      const step3Prev = document.getElementById('step3RegulationsPreview');
+      if (step3Prev) {
+        step3Prev.textContent = regText;
       }
 
       const consentCb = document.getElementById('regTermsConsent');
@@ -2746,6 +2770,24 @@
     }
 
     function openRegulationsModal() {
+      const s = getAdminSettings();
+      const regText = s.regulationsText || DEFAULT_ADMIN_SETTINGS.regulationsText;
+      const regBody = document.getElementById('regulationsModalBody');
+      if (regBody) regBody.textContent = regText;
+      document.getElementById('regulationsModal')?.classList.remove('hidden');
+    }
+
+    function resetRegulationsTextToDefault() {
+      if (!confirm('Сбросить текст регламента к стандартному тексту соревнований?')) return;
+      const el = document.getElementById('adminRegulationsText');
+      if (el) el.value = DEFAULT_ADMIN_SETTINGS.regulationsText;
+    }
+
+    function previewRegulationsModalFromAdmin() {
+      const el = document.getElementById('adminRegulationsText');
+      const val = el ? el.value : '';
+      const regBody = document.getElementById('regulationsModalBody');
+      if (regBody) regBody.textContent = val || DEFAULT_ADMIN_SETTINGS.regulationsText;
       document.getElementById('regulationsModal')?.classList.remove('hidden');
     }
     function closeRegulationsModal() {
