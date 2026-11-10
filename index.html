@@ -998,7 +998,7 @@
               <input 
                 type="url" 
                 id="adminGsheetWebhook" 
-                value="https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec"
+                value="https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec"
                 placeholder="https://script.google.com/macros/s/.../exec"
                 class="w-full bg-[#080d19] border border-[#212f4d] focus:border-amber-400 rounded-xl px-4 py-3 text-xs text-white outline-none font-mono transition"
               >
@@ -1449,7 +1449,7 @@
 
   <script>
     // Official tournament Google Apps Script Webhook (24/7 cloud sync)
-    window.GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec";
+    window.GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec";
     
     // Google Sheet Config Functions
     function openConfigModal() {
@@ -1536,16 +1536,16 @@
     let currentPilotFilter = 'all'; // 'all' | 'approved' | 'pending' | 'rejected'
 
     const DEFAULT_ADMIN_SETTINGS = {
-      tournamentTitle: "DRIFT CHAMPIONSHIP",
-      stageBadge: "ЭТАП 1",
+      tournamentTitle: "DRIFT BANDA",
+      stageBadge: "ЭТАП 2",
       telegramChannelUrl: "https://t.me/drift_banda",
       telegramChannelText: "@drift_banda",
-      allowCarNumber: true,
+      allowCarNumber: false,
       allowVdc: true,
       allowCustomCar: true,
       allowLivery: false,
-      allowTeam: true,
-      requireReceipt: false,
+      allowTeam: false,
+      requireReceipt: true,
       baseFee: 150,
       liveryFee: 100,
       recipientName: "Слизов Тимофей Олегович",
@@ -1554,7 +1554,7 @@
       boostyUrl: "https://boosty.to/drift_banda",
       allowBoosty: true,
       requireConsent: true,
-      gsheetWebhook: "https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec",
+      gsheetWebhook: "https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec",
       gsheetViewUrl: "https://docs.google.com/spreadsheets/d/18MzACup3xJOxFxOrceMZekuFm2nAISroVrrO2-UYfCE/edit?usp=sharing",
       adminPin: "7777",
       judgePin: "5555",
@@ -1734,7 +1734,7 @@
       const s = getAdminSettings();
       const area = document.getElementById('gsheetScriptCodeArea');
       if (area) area.value = GSHEET_RAW_CODE;
-      const webhook = s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || localStorage.getItem('AC_REG_GOOGLE_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec';
+      const webhook = s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || localStorage.getItem('AC_REG_GOOGLE_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
       const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
       const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
 
@@ -1774,7 +1774,7 @@
       if (typeof currentUserRole !== 'undefined' && currentUserRole === 'admin') {
         return;
       }
-      const webhookUrl = window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec';
+      const webhookUrl = window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
       try {
         const fetchUrl = webhookUrl + (webhookUrl.indexOf('?') === -1 ? '?action=get_settings&t=' : '&action=get_settings&t=') + Date.now();
         const resp = await fetch(fetchUrl, { method: 'GET', cache: 'no-store' });
@@ -1806,7 +1806,7 @@
       const getVal = (id, def = '') => (document.getElementById(id)?.value || def).trim();
       const getChk = (id) => !!document.getElementById(id)?.checked;
 
-      const webhook = getVal('adminGsheetWebhook') || window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec';
+      const webhook = getVal('adminGsheetWebhook') || window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
       const s = {
         tournamentTitle: getVal('adminTournamentTitle', 'DRIFT CHAMPIONSHIP'),
         stageBadge: getVal('adminStageBadge', 'ЭТАП 1'),
@@ -1997,7 +1997,7 @@
     }
 
     async function testAdminGsheetSend() {
-      const url = (document.getElementById('adminGsheetWebhook')?.value || '').trim() || window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec';
+      const url = (document.getElementById('adminGsheetWebhook')?.value || '').trim() || window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
       const status = document.getElementById('adminGsheetStatusMsg');
       if (!url) {
         if (status) {
@@ -2065,7 +2065,7 @@
       if (btn) btn.disabled = true;
 
       const s = getAdminSettings();
-      const webhookUrl = (document.getElementById('adminGsheetWebhook')?.value || '').trim() || s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec';
+      const webhookUrl = (document.getElementById('adminGsheetWebhook')?.value || '').trim() || s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
 
       try {
         const fetchUrl = webhookUrl + (webhookUrl.indexOf('?') === -1 ? '?action=get_pilots&t=' : '&action=get_pilots&t=') + Date.now();
@@ -2411,7 +2411,7 @@
 
       // Sync status to Google Sheets Webhook
       const s = getAdminSettings();
-      const webhookUrl = s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || localStorage.getItem('AC_REG_GOOGLE_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec';
+      const webhookUrl = s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || localStorage.getItem('AC_REG_GOOGLE_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
 
       if (webhookUrl) {
         try {
@@ -2547,7 +2547,7 @@
 
       // 2. Clear Google Sheet via Webhook
       const s = getAdminSettings();
-      const webhookUrl = s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || localStorage.getItem('AC_REG_GOOGLE_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec';
+      const webhookUrl = s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || localStorage.getItem('AC_REG_GOOGLE_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
 
       if (webhookUrl) {
         try {
