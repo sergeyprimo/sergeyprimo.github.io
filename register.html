@@ -58,8 +58,8 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <a href="judges.html" class="text-xs bg-[#162038] hover:bg-[#202e52] border border-[#2b3a5f] text-cyan-300 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition">
-          <span>⚖️</span> <span class="hidden sm:inline">Судейская сетка</span>
+        <a href="https://sergeyprimo.github.io/top32/" onclick="if(window.location.protocol==='file:'){this.href='top32.html';}" class="text-xs bg-[#162038] hover:bg-[#202e52] border border-[#2b3a5f] text-cyan-300 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition" title="Открыть зрительскую сетку заездов ТОП-32">
+          <span>🏆</span> <span class="hidden sm:inline">Сетка ТОП-32 (Зрители)</span>
         </a>
         <button type="button" onclick="openJudgeAuthModal()" class="text-xs bg-[#1e1735] hover:bg-[#2e2050] border border-purple-500/40 text-purple-300 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition shadow-sm cursor-pointer" title="Тонкие настройки интерфейса регистрации (доступ по паролю)">
           <span>🔐</span> <span>Админ</span>
@@ -861,6 +861,9 @@
       </div>
 
       <div class="flex items-center gap-3">
+        <a href="https://sergeyprimo.github.io/top32/judges.html" target="_blank" onclick="if(window.location.protocol==='file:'){this.href='judges.html';}" class="text-xs bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-500/50 text-cyan-300 px-3 py-1.5 rounded-lg font-black flex items-center gap-1.5 transition shadow-sm" title="Открыть судейскую панель для оценки заездов">
+          <span>⚖️</span> <span class="hidden md:inline">Судейская сетка</span>
+        </a>
         <button type="button" onclick="closeJudgeSettingsModal()" class="text-xs bg-[#162035] hover:bg-[#202d4a] border border-[#26375c] text-slate-300 hover:text-white px-3.5 py-2 rounded-xl font-bold flex items-center gap-2 transition cursor-pointer shadow-sm" title="Закрыть панель (Esc)">
           <span>✕</span> <span class="hidden sm:inline">Закрыть (Esc)</span>
         </button>
