@@ -1768,90 +1768,32 @@
     }
 
     
-    function parseSettingsCsv(csvText) {
-      if (!csvText) return null;
-      const settings = {};
-      const lines = [];
-      let currentLine = '';
-      let inQuotes = false;
-      for (let i = 0; i < csvText.length; i++) {
-        const ch = csvText[i];
-        if (ch === '"') {
-          if (inQuotes && csvText[i+1] === '"') {
-            currentLine += '"';
-            i++;
-          } else {
-            inQuotes = !inQuotes;
-          }
-        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
-          if (currentLine.trim()) lines.push(currentLine);
-          currentLine = '';
-        } else {
-          currentLine += ch;
-        }
-      }
-      if (currentLine.trim()) lines.push(currentLine);
-
-      lines.forEach((line, idx) => {
-        if (idx === 0) return;
-        const commaIdx = line.indexOf(',');
-        if (commaIdx === -1) return;
-        let k = line.substring(0, commaIdx).trim();
-        let v = line.substring(commaIdx + 1).trim();
-        if (k.startsWith('"') && k.endsWith('"')) k = k.slice(1, -1);
-        if (v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1);
-
-        if (v.toUpperCase() === 'TRUE') v = true;
-        else if (v.toUpperCase() === 'FALSE') v = false;
-        else if (!isNaN(v) && v !== '' && (k.toLowerCase().includes('fee') || k.toLowerCase().includes('pin'))) v = Number(v);
-
-        if (k) settings[k] = v;
-      });
-
-      return Object.keys(settings).length > 0 ? settings : null;
-    }
-
+        // Безопасная загрузка настроек турнира
     async function loadCloudSettings() {
+      // Никогда не перезаписываем настройки, если открыта панель главного администратора
+      if (typeof currentUserRole !== 'undefined' && currentUserRole === 'admin') {
+        return;
+      }
       const webhookUrl = window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbyzJ_dMJdqV7NEg_K6pdZEn_pvVvci8FtK7zUFlfrl-OxI9Wp4lIuLgb1SG-NpX3kzB/exec';
-      const sheetId = '18MzACup3xJOxFxOrceMZekuFm2nAISroVrrO2-UYfCE';
-      let cloudSettings = null;
-
-      // Канал 1: Google Apps Script Webhook
       try {
         const fetchUrl = webhookUrl + (webhookUrl.indexOf('?') === -1 ? '?action=get_settings&t=' : '&action=get_settings&t=') + Date.now();
         const resp = await fetch(fetchUrl, { method: 'GET', cache: 'no-store' });
         const data = await resp.json();
-        if (data && data.settings && typeof data.settings === 'object' && Object.keys(data.settings).length > 0) {
-          cloudSettings = data.settings;
-        }
-      } catch (err) {}
-
-      // Канал 2 (Мгновенный резерв): Прямое чтение вкладки «Настройки» Google Таблицы через GViz CSV
-      if (!cloudSettings) {
-        try {
-          const gvizCsvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=%D0%9D%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B8&headers=0&t=` + Date.now();
-          const resp = await fetch(gvizCsvUrl, { cache: 'no-store' });
-          if (resp.ok) {
-            const csvText = await resp.text();
-            cloudSettings = parseSettingsCsv(csvText);
+        // Применяем настройки только если они вернулись валидным объектом из обновленного скрипта
+        if (data && data.status === 'ok' && data.settings && typeof data.settings === 'object' && Object.keys(data.settings).length > 0) {
+          const current = getAdminSettings();
+          const cleanSettings = {};
+          for (const k in data.settings) {
+            if (data.settings[k] !== '' && data.settings[k] !== null && data.settings[k] !== undefined) {
+              cleanSettings[k] = data.settings[k];
+            }
           }
-        } catch (err) {}
-      }
-
-      if (cloudSettings && typeof cloudSettings === 'object') {
-        const current = getAdminSettings();
-        let changed = false;
-        for (const k in cloudSettings) {
-          if (String(cloudSettings[k]) !== String(current[k])) {
-            changed = true;
-            break;
-          }
-        }
-        if (changed) {
-          const merged = { ...current, ...cloudSettings };
+          const merged = Object.assign({}, DEFAULT_ADMIN_SETTINGS, current, cleanSettings);
           localStorage.setItem('AC_REG_SETTINGS', JSON.stringify(merged));
           applyAdminSettingsToInterface();
         }
+      } catch (err) {
+        // При ошибке или старом скрипте спокойно используем DEFAULT_ADMIN_SETTINGS
       }
     }
 
@@ -1889,28 +1831,19 @@
         regulationsText: document.getElementById('adminRegulationsText')?.value || DEFAULT_ADMIN_SETTINGS.regulationsText
       };
 
+      // Сохраняем в локальное хранилище браузера администратора
       localStorage.setItem('AC_REG_SETTINGS', JSON.stringify(s));
-      // Синхронизация настроек в Google Apps Script (24/7 для всех пилотов)
-      if (webhook) {
-        try {
-          fetch(webhook, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'save_settings', settings: s })
-          });
-        } catch (err) {
-          console.warn('save_settings sync error:', err);
-        }
-      }
       if (webhook) {
         localStorage.setItem('AC_REG_GOOGLE_SHEET_URL', webhook);
       }
 
+      // Немедленно применяем ко всему интерфейсу
       applyAdminSettingsToInterface();
+      if (typeof updateFeeDisplay === 'function') updateFeeDisplay();
 
       const notif = document.getElementById('adminSaveNotify');
       if (notif) {
+        notif.textContent = '✅ Настройки успешно сохранены и применены!';
         notif.classList.remove('hidden');
         setTimeout(() => notif.classList.add('hidden'), 3500);
       }
@@ -3042,14 +2975,8 @@
       applyAdminSettingsToInterface();
       renderRegSteps();
       loadCloudSettings();
-      // Живая фоновая автосинхронизация каждые 15 сек для всех пользователей
-      setInterval(loadCloudSettings, 15000);
-      document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) loadCloudSettings();
-      });
-      window.addEventListener('focus', function() {
-        loadCloudSettings();
-      });
+      // Однократная фоновая проверка настроек при открытии страницы
+      loadCloudSettings();
     });
     try {
       applyAdminSettingsToInterface();
