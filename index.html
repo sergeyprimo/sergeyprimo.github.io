@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Регистрация пилотов — DRIFT CHAMPIONSHIP</title>
+  <title>Регистрация пилотов — DRIFT BANDA</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22><text y=%2222%22 font-size=%2220%22>🏎️</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -45,10 +45,10 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 id="displayTournamentTitle" class="text-sm sm:text-base font-black uppercase tracking-tight text-white">
-              DRIFT CHAMPIONSHIP
+              DRIFT BANDA
             </h1>
             <span id="displayStageBadge" class="text-[10px] bg-amber-950/80 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-bold font-mono">
-              ЭТАП 1
+              ЭТАП 2
             </span>
           </div>
           <p class="text-[11px] text-slate-400 hidden sm:block">
@@ -181,7 +181,7 @@
             </div>
 
             <!-- Car Number -->
-            <div id="fieldWrapperCarNumber">
+            <div id="fieldWrapperCarNumber" style="display: none;">
               <label class="block text-xs font-bold uppercase text-slate-300 mb-1.5">
                 Стартовый номер машины <span class="text-rose-400">*</span>
               </label>
@@ -1078,7 +1078,7 @@
                 <input 
                   type="text" 
                   id="adminTournamentTitle" 
-                  value="DRIFT CHAMPIONSHIP"
+                  value="DRIFT BANDA"
                   placeholder="Например: RDS GP / DRIFT CHAMPIONSHIP"
                   class="w-full bg-[#080d19] border border-[#212f4d] focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none font-bold"
                 >
@@ -1089,8 +1089,8 @@
                 <input 
                   type="text" 
                   id="adminStageBadge" 
-                  value="ЭТАП 1"
-                  placeholder="ЭТАП 1"
+                  value="ЭТАП 2"
+                  placeholder="ЭТАП 2"
                   class="w-full bg-[#080d19] border border-[#212f4d] focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-xs text-amber-300 outline-none font-mono font-bold"
                 >
               </div>
@@ -1440,7 +1440,7 @@
   <!-- Footer -->
   <footer class="border-t border-[#161f36] py-3.5 text-xs text-slate-500">
     <div class="max-w-3xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-      <p id="footerCopyrightText">© 2026 DRIFT CHAMPIONSHIP • Assetto Corsa Drift Server</p>
+      <p id="footerCopyrightText">© 2026 DRIFT BANDA • Assetto Corsa Drift Server</p>
       <button type="button" onclick="openJudgeAuthModal()" class="text-[11px] text-slate-600 hover:text-slate-400 flex items-center gap-1 transition opacity-40 hover:opacity-100 cursor-pointer">
         <span>🔐</span> <span>Судейский доступ</span>
       </button>
@@ -1738,8 +1738,8 @@
       const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
       const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
 
-      setVal('adminTournamentTitle', s.tournamentTitle || 'DRIFT CHAMPIONSHIP');
-      setVal('adminStageBadge', s.stageBadge || 'ЭТАП 1');
+      setVal('adminTournamentTitle', s.tournamentTitle || 'DRIFT BANDA');
+      setVal('adminStageBadge', s.stageBadge || 'ЭТАП 2');
       setVal('adminTelegramChannelUrl', s.telegramChannelUrl || 'https://t.me/drift_banda');
       setVal('adminTelegramChannelText', s.telegramChannelText || '@drift_banda');
 
@@ -1808,8 +1808,8 @@
 
       const webhook = getVal('adminGsheetWebhook') || window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
       const s = {
-        tournamentTitle: getVal('adminTournamentTitle', 'DRIFT CHAMPIONSHIP'),
-        stageBadge: getVal('adminStageBadge', 'ЭТАП 1'),
+        tournamentTitle: getVal('adminTournamentTitle', 'DRIFT BANDA'),
+        stageBadge: getVal('adminStageBadge', 'ЭТАП 2'),
         telegramChannelUrl: getVal('adminTelegramChannelUrl', 'https://t.me/drift_banda'),
         telegramChannelText: getVal('adminTelegramChannelText', '@drift_banda'),
         gsheetWebhook: webhook,
@@ -1854,15 +1854,15 @@
 
       // Tournament Title & Stage Badge
       const titleEl = document.getElementById('displayTournamentTitle');
-      if (titleEl) titleEl.textContent = s.tournamentTitle || 'DRIFT CHAMPIONSHIP';
+      if (titleEl) titleEl.textContent = s.tournamentTitle || 'DRIFT BANDA';
 
       const badgeEl = document.getElementById('displayStageBadge');
-      if (badgeEl) badgeEl.textContent = s.stageBadge || 'ЭТАП 1';
+      if (badgeEl) badgeEl.textContent = s.stageBadge || 'ЭТАП 2';
 
-      document.title = 'Регистрация пилотов — ' + (s.tournamentTitle || 'DRIFT CHAMPIONSHIP');
+      document.title = 'Регистрация пилотов — ' + (s.tournamentTitle || 'DRIFT BANDA');
 
       const copyEl = document.getElementById('footerCopyrightText');
-      if (copyEl) copyEl.textContent = `© 2026 ${s.tournamentTitle || 'DRIFT CHAMPIONSHIP'} • Assetto Corsa Drift Server`;
+      if (copyEl) copyEl.textContent = `© 2026 ${s.tournamentTitle || 'DRIFT BANDA'} • Assetto Corsa Drift Server`;
 
       // Official Telegram Channel in footer
       const tgLink = document.getElementById('footerTelegramChannelLink');
