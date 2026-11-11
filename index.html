@@ -1730,7 +1730,20 @@
     function getAdminSettings() {
       try {
         const raw = localStorage.getItem('AC_REG_SETTINGS');
-        if (raw) return Object.assign({}, DEFAULT_ADMIN_SETTINGS, JSON.parse(raw));
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          // Автоматическая миграция устаревших ссылок из старого кэша
+          if (parsed.boostyUrl === 'https://boosty.to/driftbandaseries' || parsed.boostyUrl === 'https://boosty.to/drift_banda') {
+            parsed.boostyUrl = 'https://boosty.to/driftbandaseries/donate';
+          }
+          if (parsed.telegramChannelUrl === 'https://t.me/drift_banda') {
+            parsed.telegramChannelUrl = 'https://t.me/driftbandakdf';
+          }
+          if (parsed.telegramChannelText === '@drift_banda') {
+            parsed.telegramChannelText = '@driftbandakdf';
+          }
+          return Object.assign({}, DEFAULT_ADMIN_SETTINGS, parsed);
+        }
       } catch(e) {}
       return Object.assign({}, DEFAULT_ADMIN_SETTINGS);
     }
@@ -2847,6 +2860,19 @@
     function openPaymentModal(method = 'sbp') {
       const s = getAdminSettings();
       if (s.allowBoosty === false) method = 'sbp';
+
+      // Гарантированно обновляем ссылки и реквизиты в модальном окне перед показом
+      const boostyUrl = s.boostyUrl || 'https://boosty.to/driftbandaseries/donate';
+      const boostyBtn = document.getElementById('modalBoostyLinkBtn');
+      if (boostyBtn) boostyBtn.href = boostyUrl;
+      const boostyInput = document.getElementById('modalBoostyLinkInput');
+      if (boostyInput) boostyInput.value = boostyUrl;
+
+      const paymentUrl = s.paymentUrl || 'https://www.tbank.ru/cf/8PJrKHvdUcq';
+      const payBtn = document.getElementById('modalPaymentLinkBtn');
+      if (payBtn) payBtn.href = paymentUrl;
+      const payInput = document.getElementById('paymentLinkInput');
+      if (payInput) payInput.value = paymentUrl;
 
       updateFeeDisplay();
       switchPaymentMethod(method);
