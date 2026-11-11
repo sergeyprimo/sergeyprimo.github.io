@@ -1388,17 +1388,22 @@
     </main>
 
     <!-- Bottom Actions Footer -->
-    <footer class="bg-[#0c1324] border-t border-[#1b2640] px-4 sm:px-8 py-3.5 flex items-center justify-between shrink-0 shadow-2xl z-20">
-      <button type="button" onclick="closeJudgeSettingsModal()" class="bg-[#141d30] hover:bg-[#1d2a45] text-slate-400 hover:text-slate-200 font-bold text-xs py-2.5 px-5 rounded-xl border border-[#202f4f] transition cursor-pointer">
-        Закрыть панель
-      </button>
+    <footer class="bg-[#0c1324] border-t border-[#1b2640] px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-2xl z-20">
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="closeJudgeSettingsModal()" class="bg-[#141d30] hover:bg-[#1d2a45] text-slate-400 hover:text-slate-200 font-bold text-xs py-2.5 px-4 rounded-xl border border-[#202f4f] transition cursor-pointer">
+          Закрыть панель
+        </button>
+        <a href="https://docs.google.com/spreadsheets/d/18MzACup3xJOxFxOrceMZekuFm2nAISroVrrO2-UYfCE/edit#gid=2032017657" target="_blank" class="bg-[#101b33] hover:bg-[#18294d] border border-cyan-500/30 text-cyan-300 font-bold text-xs py-2.5 px-3.5 rounded-xl flex items-center gap-1.5 transition" title="Открыть вкладку «Настройки» в Google Таблице">
+          <span>📊</span> <span class="hidden sm:inline">Таблица «Настройки»</span>
+        </a>
+      </div>
 
       <div class="flex items-center gap-3">
         <span id="adminSaveNotify" class="text-xs text-emerald-400 font-bold hidden flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/40 px-3 py-1.5 rounded-lg shadow-sm">
-          <span>✅</span> <span>Настройки успешно сохранены и применены!</span>
+          <span>✅</span> <span>Настройки сохранены для всех устройств!</span>
         </span>
-        <button type="button" id="btnAdminSaveAll" onclick="saveAllAdminSettings()" class="bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs py-2.5 px-7 rounded-xl uppercase tracking-wider transition shadow-lg shadow-amber-500/25 flex items-center gap-2 cursor-pointer">
-          <span>💾</span> <span>СОХРАНИТЬ ВСЕ НАСТРОЙКИ</span>
+        <button type="button" id="btnAdminSaveAll" onclick="saveAllAdminSettings()" class="bg-gradient-to-r from-emerald-500 via-teal-400 to-green-500 hover:from-emerald-400 hover:to-green-400 text-slate-950 font-black text-xs py-2.5 px-6 rounded-xl uppercase tracking-wider transition shadow-lg shadow-emerald-500/25 flex items-center gap-2 cursor-pointer">
+          <span>☁️</span> <span>СОХРАНИТЬ В ОБЛАКО (ДЛЯ ВСЕХ УСТРОЙСТВ)</span>
         </button>
       </div>
     </footer>
@@ -1810,7 +1815,7 @@
       }
     }
 
-    function saveAllAdminSettings() {
+    async function saveAllAdminSettings() {
       if (currentUserRole !== 'admin') {
         alert('Изменение общих настроек доступно только главному администратору!');
         return;
@@ -1844,21 +1849,61 @@
         regulationsText: document.getElementById('adminRegulationsText')?.value || DEFAULT_ADMIN_SETTINGS.regulationsText
       };
 
-      // Сохраняем в локальное хранилище браузера администратора
+      // 1. Сохраняем в локальное хранилище браузера администратора
       localStorage.setItem('AC_REG_SETTINGS', JSON.stringify(s));
       if (webhook) {
         localStorage.setItem('AC_REG_GOOGLE_SHEET_URL', webhook);
       }
 
-      // Немедленно применяем ко всему интерфейсу
+      // 2. Немедленно применяем ко всему интерфейсу
       applyAdminSettingsToInterface();
       if (typeof updateFeeDisplay === 'function') updateFeeDisplay();
 
       const notif = document.getElementById('adminSaveNotify');
+      const btn = document.getElementById('btnAdminSaveAll');
+      const oldBtnHtml = btn ? btn.innerHTML : '';
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> <span>СОХРАНЯЕМ В ОБЛАКО...</span>';
+      }
       if (notif) {
-        notif.textContent = '✅ Настройки успешно сохранены и применены!';
+        notif.className = 'text-xs text-amber-300 font-bold flex items-center gap-1.5 bg-amber-950/80 border border-amber-500/40 px-3 py-1.5 rounded-lg shadow-sm';
+        notif.innerHTML = '<span>⏳</span> <span>Отправка в Google Таблицу...</span>';
         notif.classList.remove('hidden');
-        setTimeout(() => notif.classList.add('hidden'), 3500);
+      }
+
+      // 3. Отправляем в Google Таблицу через вебхук для синхронизации всех устройств
+      try {
+        if (webhook) {
+          await fetch(webhook, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'save_settings',
+              settings: s
+            })
+          });
+        }
+        if (notif) {
+          notif.className = 'text-xs text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/40 px-3 py-1.5 rounded-lg shadow-sm';
+          notif.innerHTML = '<span>✅</span> <span>Настройки сохранены в облако для всех устройств!</span>';
+        }
+      } catch (err) {
+        console.warn('Облачное сохранение через вебхук:', err);
+        if (notif) {
+          notif.className = 'text-xs text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/40 px-3 py-1.5 rounded-lg shadow-sm';
+          notif.innerHTML = '<span>✅</span> <span>Настройки сохранены и применены!</span>';
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = oldBtnHtml;
+        }
+        setTimeout(() => {
+          if (notif) notif.classList.add('hidden');
+        }, 5000);
       }
     }
 
