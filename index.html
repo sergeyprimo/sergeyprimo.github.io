@@ -474,6 +474,9 @@
                     <p class="text-xs text-slate-300 mt-2.5 leading-relaxed">
                       Быстрый перевод без комиссии по QR-коду СБП через мобильное приложение любого банка РФ (Т-Банк, Сбер, ВТБ, Альфа и др.).
                     </p>
+                    <p class="text-[11px] text-amber-400/90 mt-2 flex items-center gap-1.5 font-medium">
+                      <span>⚠️</span> <span>Оплата по ссылке банка работает только при выключенном VPN</span>
+                    </p>
                   </div>
 
                   <button 
@@ -676,6 +679,10 @@
             >
               <span>Открыть</span> <span>↗</span>
             </a>
+          </div>
+          <div class="mt-2 text-[11px] text-amber-300/90 bg-amber-950/35 border border-amber-500/25 rounded-lg px-3 py-1.5 flex items-center gap-2">
+            <span class="text-xs shrink-0">⚠️</span>
+            <span><b>Заметка:</b> оплата по ссылке работает <b>только при выключенном VPN</b> (банки РФ блокируют зарубежные IP).</span>
           </div>
         </div>
       </div>
@@ -2892,6 +2899,8 @@
       const paymentUrl = s.paymentUrl || 'https://www.tbank.ru/cf/8PJrKHvdUcq';
       const payBtn = document.getElementById('modalPaymentLinkBtn');
       if (payBtn) payBtn.href = paymentUrl;
+      const directPayLink = document.getElementById('modalPaymentDirectLink');
+      if (directPayLink) directPayLink.href = paymentUrl;
       const payInput = document.getElementById('paymentLinkInput');
       if (payInput) payInput.value = paymentUrl;
 
@@ -3095,7 +3104,7 @@
 
     // Автоматическая проверка обновлений интерфейса
     (function checkAppVersion() {
-      const CURRENT_BUILD = '20261111-v5';
+      const CURRENT_BUILD = '20261112-v6';
       try {
         fetch('version.json?_t=' + Date.now(), { cache: 'no-store' })
           .then(function(r) { return r.ok ? r.json() : null; })
