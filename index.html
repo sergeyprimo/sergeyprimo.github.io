@@ -1733,8 +1733,11 @@
         if (raw) {
           const parsed = JSON.parse(raw);
           // Автоматическая миграция устаревших ссылок из старого кэша
-          if (parsed.boostyUrl === 'https://boosty.to/driftbandaseries' || parsed.boostyUrl === 'https://boosty.to/drift_banda') {
-            parsed.boostyUrl = 'https://boosty.to/driftbandaseries/donate';
+          if (typeof parsed.boostyUrl === 'string') {
+            const b = parsed.boostyUrl.trim().replace(/\/+$/, '');
+            if (b === 'https://boosty.to/driftbandaseries' || b === 'https://boosty.to/drift_banda' || (b.includes('boosty.to/driftbandaseries') && !b.includes('/donate'))) {
+              parsed.boostyUrl = 'https://boosty.to/driftbandaseries/donate';
+            }
           }
           if (parsed.telegramChannelUrl === 'https://t.me/drift_banda') {
             parsed.telegramChannelUrl = 'https://t.me/driftbandakdf';
@@ -1818,6 +1821,12 @@
           }
         }
         if (Object.keys(cloudSettings).length > 0) {
+          if (cloudSettings.boostyUrl && typeof cloudSettings.boostyUrl === 'string') {
+            const b = cloudSettings.boostyUrl.trim().replace(/\/+$/, '');
+            if (b.includes('boosty.to/driftbandaseries') && !b.includes('/donate')) {
+              cloudSettings.boostyUrl = 'https://boosty.to/driftbandaseries/donate';
+            }
+          }
           const current = getAdminSettings();
           const merged = Object.assign({}, DEFAULT_ADMIN_SETTINGS, current, cloudSettings);
           localStorage.setItem('AC_REG_SETTINGS', JSON.stringify(merged));
@@ -1856,7 +1865,13 @@
         recipientName: getVal('adminRecipientName', 'Слизов Тимофей Олегович'),
         paymentUrl: getVal('adminPaymentUrl', 'https://www.tbank.ru/cf/8PJrKHvdUcq'),
         qrImageUrl: getVal('adminQrImageUrl'),
-        boostyUrl: getVal('adminBoostyUrl', 'https://boosty.to/driftbandaseries/donate'),
+        boostyUrl: (function() {
+          let b = getVal('adminBoostyUrl', 'https://boosty.to/driftbandaseries/donate');
+          if (b.includes('boosty.to/driftbandaseries') && !b.includes('/donate')) {
+            b = 'https://boosty.to/driftbandaseries/donate';
+          }
+          return b;
+        })(),
         allowBoosty: getChk('adminOptAllowBoosty'),
         requireConsent: getChk('adminOptRequireConsent'),
         regulationsText: document.getElementById('adminRegulationsText')?.value || DEFAULT_ADMIN_SETTINGS.regulationsText
@@ -1986,7 +2001,10 @@
       if (directPayLink) directPayLink.href = s.paymentUrl;
 
       // Boosty settings
-      const boostyUrl = s.boostyUrl || 'https://boosty.to/driftbandaseries/donate';
+      let boostyUrl = (s.boostyUrl || 'https://boosty.to/driftbandaseries/donate').trim();
+      if (boostyUrl.includes('boosty.to/driftbandaseries') && !boostyUrl.includes('/donate')) {
+        boostyUrl = 'https://boosty.to/driftbandaseries/donate';
+      }
       const allowBoosty = s.allowBoosty !== false;
 
       const step3BoostyCard = document.getElementById('step3BoostyCard');
@@ -2862,7 +2880,10 @@
       if (s.allowBoosty === false) method = 'sbp';
 
       // Гарантированно обновляем ссылки и реквизиты в модальном окне перед показом
-      const boostyUrl = s.boostyUrl || 'https://boosty.to/driftbandaseries/donate';
+      let boostyUrl = (s.boostyUrl || 'https://boosty.to/driftbandaseries/donate').trim();
+      if (boostyUrl.includes('boosty.to/driftbandaseries') && !boostyUrl.includes('/donate')) {
+        boostyUrl = 'https://boosty.to/driftbandaseries/donate';
+      }
       const boostyBtn = document.getElementById('modalBoostyLinkBtn');
       if (boostyBtn) boostyBtn.href = boostyUrl;
       const boostyInput = document.getElementById('modalBoostyLinkInput');
@@ -3064,6 +3085,30 @@
       window.addEventListener('focus', loadCloudSettings);
       setInterval(loadCloudSettings, 30000);
     });
+
+    // Мобильная защита: при возвращении на вкладку из фонового режима (BFCache)
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        window.location.reload();
+      }
+    });
+
+    // Автоматическая проверка обновлений интерфейса
+    (function checkAppVersion() {
+      const CURRENT_BUILD = '20261111-v5';
+      try {
+        fetch('version.json?_t=' + Date.now(), { cache: 'no-store' })
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(data) {
+            if (data && data.version && data.version !== CURRENT_BUILD) {
+              console.log('Обнаружена новая версия:', data.version, 'перезагрузка...');
+              window.location.reload(true);
+            }
+          })
+          .catch(function() {});
+      } catch(e) {}
+    })();
+
     try {
       applyAdminSettingsToInterface();
     } catch(e) {}
