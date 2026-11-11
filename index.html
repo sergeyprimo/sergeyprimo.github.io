@@ -701,7 +701,7 @@
           <!-- Direct Boosty Action Button -->
           <a 
             id="modalBoostyLinkBtn" 
-            href="https://boosty.to/driftbandaseries" 
+            href="https://boosty.to/driftbandaseries/donate" 
             target="_blank" 
             rel="noopener noreferrer"
             class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-slate-950 font-black text-xs py-3 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-orange-500/25 transition cursor-pointer"
@@ -717,7 +717,7 @@
                 type="text" 
                 readonly 
                 id="modalBoostyLinkInput" 
-                value="https://boosty.to/driftbandaseries"
+                value="https://boosty.to/driftbandaseries/donate"
                 class="flex-1 bg-[#090d19] border border-[#232f50] rounded-lg px-3 py-2 text-xs text-orange-300 font-mono"
               >
               <button 
@@ -1268,7 +1268,7 @@
                 <input 
                   type="url" 
                   id="adminBoostyUrl" 
-                  value="https://boosty.to/driftbandaseries"
+                  value="https://boosty.to/driftbandaseries/donate"
                   placeholder="https://boosty.to/..."
                   class="w-full bg-[#080d19] border border-[#212f4d] focus:border-orange-400 rounded-xl px-4 py-3 text-xs text-orange-300 outline-none font-mono"
                 >
@@ -1556,7 +1556,7 @@
       recipientName: "Слизов Тимофей Олегович",
       paymentUrl: "https://www.tbank.ru/cf/8PJrKHvdUcq",
       qrImageUrl: "",
-      boostyUrl: "https://boosty.to/driftbandaseries",
+      boostyUrl: "https://boosty.to/driftbandaseries/donate",
       allowBoosty: true,
       requireConsent: true,
       gsheetWebhook: "https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec",
@@ -1761,7 +1761,7 @@
       setVal('adminRecipientName', s.recipientName || 'Слизов Тимофей Олегович');
       setVal('adminPaymentUrl', s.paymentUrl || 'https://www.tbank.ru/cf/8PJrKHvdUcq');
       setVal('adminQrImageUrl', s.qrImageUrl || '');
-      setVal('adminBoostyUrl', s.boostyUrl || 'https://boosty.to/driftbandaseries');
+      setVal('adminBoostyUrl', s.boostyUrl || 'https://boosty.to/driftbandaseries/donate');
       setChk('adminOptAllowBoosty', s.allowBoosty !== false);
       setChk('adminOptRequireConsent', s.requireConsent !== false);
       let curReg = s.regulationsText || DEFAULT_ADMIN_SETTINGS.regulationsText;
@@ -1843,7 +1843,7 @@
         recipientName: getVal('adminRecipientName', 'Слизов Тимофей Олегович'),
         paymentUrl: getVal('adminPaymentUrl', 'https://www.tbank.ru/cf/8PJrKHvdUcq'),
         qrImageUrl: getVal('adminQrImageUrl'),
-        boostyUrl: getVal('adminBoostyUrl', 'https://boosty.to/driftbandaseries'),
+        boostyUrl: getVal('adminBoostyUrl', 'https://boosty.to/driftbandaseries/donate'),
         allowBoosty: getChk('adminOptAllowBoosty'),
         requireConsent: getChk('adminOptRequireConsent'),
         regulationsText: document.getElementById('adminRegulationsText')?.value || DEFAULT_ADMIN_SETTINGS.regulationsText
@@ -1973,7 +1973,7 @@
       if (directPayLink) directPayLink.href = s.paymentUrl;
 
       // Boosty settings
-      const boostyUrl = s.boostyUrl || 'https://boosty.to/driftbandaseries';
+      const boostyUrl = s.boostyUrl || 'https://boosty.to/driftbandaseries/donate';
       const allowBoosty = s.allowBoosty !== false;
 
       const step3BoostyCard = document.getElementById('step3BoostyCard');
