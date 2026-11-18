@@ -1,0 +1,20 @@
+{
+  "registrationClosed": true,
+  "registrationClosedMessage": "Приём заявок на данный этап чемпионата официально закрыт администрацией. Все поданные заявки находятся на проверке судейской коллегией.",
+  "tournamentTitle": "DRIFT BANDA",
+  "stageBadge": "ЭТАП 2",
+  "telegramChannelUrl": "https://t.me/driftbandakdf",
+  "telegramChannelText": "@driftbandakdf",
+  "allowCarNumber": false,
+  "allowVdc": true,
+  "allowCustomCar": true,
+  "allowLivery": false,
+  "allowTeam": false,
+  "requireReceipt": true,
+  "baseFee": 200,
+  "liveryFee": 100,
+  "recipientName": "Слизов Тимофей Олегович",
+  "paymentUrl": "https://www.tbank.ru/cf/8PJrKHvdUcq",
+  "boostyUrl": "https://boosty.to/driftbandaseries/donate",
+  "allowBoosty": true
+}

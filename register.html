@@ -82,7 +82,7 @@
   <main class="max-w-3xl mx-auto px-4 py-8 w-full flex-1">
     
     <!-- Title Card -->
-    <div id="registrationTitleCard" class="mb-6 text-center sm:text-left">
+    <div id="registrationTitleCard" class="mb-6 text-center sm:text-left" style="display: none;">
       <h2 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
         ОФИЦИАЛЬНАЯ РЕГИСТРАЦИЯ ПИЛОТА
       </h2>
@@ -92,7 +92,7 @@
     </div>
 
     <!-- Multi-Step Registration Form Card -->
-    <div id="pilotRegistrationFormCard" class="rds-card rounded-2xl p-6 sm:p-8 shadow-2xl border border-[#1e2a47]">
+    <div id="pilotRegistrationFormCard" class="rds-card rounded-2xl p-6 sm:p-8 shadow-2xl border border-[#1e2a47]" style="display: none;">
       <form id="pilotRegistrationForm" onsubmit="handleRegistrationSubmit(event)" class="space-y-6">
 
         <!-- Stepper Indicator -->
@@ -610,7 +610,7 @@
     </div>
 
     <!-- Registration Closed Plate / Banner -->
-    <div id="registrationClosedPlate" class="hidden rds-card rounded-2xl p-8 sm:p-12 text-center shadow-2xl border border-rose-500/40 bg-gradient-to-b from-[#140b17] via-[#0f1424] to-[#070b16] space-y-6">
+    <div id="registrationClosedPlate" class="rds-card rounded-2xl p-8 sm:p-12 text-center shadow-2xl border border-rose-500/40 bg-gradient-to-b from-[#140b17] via-[#0f1424] to-[#070b16] space-y-6">
       <div class="w-20 h-20 mx-auto rounded-3xl bg-rose-500/10 border-2 border-rose-500/30 flex items-center justify-center text-4xl shadow-xl shadow-rose-500/20">
         🏁
       </div>
@@ -1650,7 +1650,7 @@
     const DEFAULT_ADMIN_SETTINGS = {
       tournamentTitle: "DRIFT BANDA",
       stageBadge: "ЭТАП 2",
-      registrationClosed: false,
+      registrationClosed: true,
       registrationClosedMessage: "Приём заявок на данный этап чемпионата официально закрыт администрацией. Все поданные заявки находятся на проверке судейской коллегией.",
       telegramChannelUrl: "https://t.me/driftbandakdf",
       telegramChannelText: "@driftbandakdf",
@@ -1855,6 +1855,10 @@
           if (parsed.telegramChannelText === '@drift_banda') {
             parsed.telegramChannelText = '@driftbandakdf';
           }
+          // Обычные пользователи и мобильные устройства никогда не должны открывать регистрацию из старого кэша
+          if (currentUserRole !== 'admin') {
+            parsed.registrationClosed = DEFAULT_ADMIN_SETTINGS.registrationClosed;
+          }
           return Object.assign({}, DEFAULT_ADMIN_SETTINGS, parsed);
         }
       } catch(e) {}
@@ -1909,44 +1913,66 @@
         return;
       }
       const sheetId = '18MzACup3xJOxFxOrceMZekuFm2nAISroVrrO2-UYfCE';
+      const cloudSettings = {};
+
+      // 1. Быстрая загрузка глобальных настроек турнира из settings.json (GitHub Pages / Local)
+      try {
+        const sResp = await fetch('settings.json?_t=' + Date.now(), { cache: 'no-store' });
+        if (sResp.ok) {
+          const sJson = await sResp.json();
+          if (sJson && typeof sJson === 'object') {
+            Object.assign(cloudSettings, sJson);
+          }
+        }
+      } catch (e) {}
+
+      // 2. Загрузка настроек из Google Таблицы (вкладка "Настройки")
       const gvizUrl = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent('Настройки') + '&headers=0&_t=' + Date.now();
       try {
         const resp = await fetch(gvizUrl, { cache: 'no-store' });
-        if (!resp.ok) return;
-        const csvText = await resp.text();
-        const lines = csvText.split(/\r?\n/);
-        const cloudSettings = {};
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (!line) continue;
-          const match = line.match(/^"([^"]*)","(.*)"$/);
-          if (match) {
-            const key = match[1].trim();
-            let val = match[2].trim().replace(/""/g, '"');
-            if (!key || key === 'Параметр') continue;
-            if (val === 'TRUE' || val === 'true') val = true;
-            else if (val === 'FALSE' || val === 'false') val = false;
-            else if (key === 'baseFee' || key === 'liveryFee') {
-              const num = parseInt(val, 10);
-              if (!isNaN(num)) val = num;
-            }
-            cloudSettings[key] = val;
-          }
-        }
-        if (Object.keys(cloudSettings).length > 0) {
-          if (cloudSettings.boostyUrl && typeof cloudSettings.boostyUrl === 'string') {
-            const b = cloudSettings.boostyUrl.trim().replace(/\/+$/, '');
-            if (b.includes('boosty.to/driftbandaseries') && !b.includes('/donate')) {
-              cloudSettings.boostyUrl = 'https://boosty.to/driftbandaseries/donate';
+        if (resp.ok) {
+          const csvText = await resp.text();
+          const lines = csvText.split(/\r?\n/);
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            const match = line.match(/^"([^"]*)","(.*)"$/);
+            if (match) {
+              const key = match[1].trim();
+              let val = match[2].trim().replace(/""/g, '"');
+              if (!key || key === 'Параметр') continue;
+              if (val === 'TRUE' || val === 'true') val = true;
+              else if (val === 'FALSE' || val === 'false') val = false;
+              else if (key === 'baseFee' || key === 'liveryFee') {
+                const num = parseInt(val, 10);
+                if (!isNaN(num)) val = num;
+              }
+              cloudSettings[key] = val;
             }
           }
-          const current = getAdminSettings();
-          const merged = Object.assign({}, DEFAULT_ADMIN_SETTINGS, current, cloudSettings);
-          localStorage.setItem('AC_REG_SETTINGS', JSON.stringify(merged));
-          applyAdminSettingsToInterface();
         }
       } catch (err) {
         console.warn('loadCloudSettings fetch failed:', err);
+      }
+
+      if (Object.keys(cloudSettings).length > 0) {
+        if (cloudSettings.boostyUrl && typeof cloudSettings.boostyUrl === 'string') {
+          const b = cloudSettings.boostyUrl.trim().replace(/\/+$/, '');
+          if (b.includes('boosty.to/driftbandaseries') && !b.includes('/donate')) {
+            cloudSettings.boostyUrl = 'https://boosty.to/driftbandaseries/donate';
+          }
+        }
+        // Если в облачных настройках нет явного registrationClosed, берем значение по умолчанию
+        if (typeof cloudSettings.registrationClosed === 'undefined') {
+          cloudSettings.registrationClosed = DEFAULT_ADMIN_SETTINGS.registrationClosed;
+        }
+        const current = getAdminSettings();
+        const merged = Object.assign({}, DEFAULT_ADMIN_SETTINGS, current, cloudSettings);
+        if (currentUserRole !== 'admin') {
+          merged.registrationClosed = cloudSettings.registrationClosed;
+        }
+        localStorage.setItem('AC_REG_SETTINGS', JSON.stringify(merged));
+        applyAdminSettingsToInterface();
       }
     }
 
@@ -2019,29 +2045,11 @@
         notif.classList.remove('hidden');
       }
 
-      // 3. Отправляем в Google Таблицу через вебхук для синхронизации всех устройств
+      if (notif) {
+        notif.className = 'text-xs text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/40 px-3 py-1.5 rounded-lg shadow-sm';
+        notif.innerHTML = '<span>✅</span> <span>Настройки успешно применены!</span>';
+      }
       try {
-        if (webhook) {
-          await fetch(webhook, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'save_settings',
-              settings: s
-            })
-          });
-        }
-        if (notif) {
-          notif.className = 'text-xs text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/40 px-3 py-1.5 rounded-lg shadow-sm';
-          notif.innerHTML = '<span>✅</span> <span>Настройки сохранены в облако для всех устройств!</span>';
-        }
-      } catch (err) {
-        console.warn('Облачное сохранение через вебхук:', err);
-        if (notif) {
-          notif.className = 'text-xs text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/40 px-3 py-1.5 rounded-lg shadow-sm';
-          notif.innerHTML = '<span>✅</span> <span>Настройки сохранены и применены!</span>';
-        }
       } finally {
         if (btn) {
           btn.disabled = false;
@@ -2074,11 +2082,17 @@
       if (isClosed) {
         if (titleCard) titleCard.style.display = 'none';
         if (formCard) formCard.style.display = 'none';
-        if (closedPlate) closedPlate.classList.remove('hidden');
+        if (closedPlate) {
+          closedPlate.classList.remove('hidden');
+          closedPlate.style.display = '';
+        }
       } else {
         if (titleCard) titleCard.style.display = '';
         if (formCard) formCard.style.display = '';
-        if (closedPlate) closedPlate.classList.add('hidden');
+        if (closedPlate) {
+          closedPlate.classList.add('hidden');
+          closedPlate.style.display = 'none';
+        }
       }
 
       updateRegistrationToggleButtons(isClosed);
@@ -2279,19 +2293,8 @@
       applyAdminSettingsToInterface();
       updateRegistrationToggleButtons(willClose);
 
-      // Фоновое сохранение через вебхук для облака
-      const webhook = s.gsheetWebhook || window.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbw59buttRaWAbh6Vr86ecP0rse3Eg3UVA2WbzxwjFeDgS7Q7SGp6raSYWPVKIUkLI1V/exec';
-      if (webhook) {
-        fetch(webhook, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'save_settings',
-            settings: s
-          })
-        }).catch(err => console.warn('Webhook sync error:', err));
-      }
+      // Обновляем DEFAULT_ADMIN_SETTINGS на лету для текущей сессии
+      DEFAULT_ADMIN_SETTINGS.registrationClosed = willClose;
     }
 
     function saveAdminNewPin() {
@@ -3350,7 +3353,7 @@
 
     // Автоматическая проверка обновлений интерфейса
     (function checkAppVersion() {
-      const CURRENT_BUILD = '20261118-v8';
+      const CURRENT_BUILD = '20261118-v9';
       try {
         fetch('version.json?_t=' + Date.now(), { cache: 'no-store' })
           .then(function(r) { return r.ok ? r.json() : null; })
